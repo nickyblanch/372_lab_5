@@ -2,11 +2,11 @@
 #include <Arduino.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "switch.cpp"
-#include "timer.cpp"
-#include "pwm.cpp"
-#include "spi.cpp"
-#include "i2c.cpp"
+#include "switch.h"
+#include "timer.h"
+#include "pwm.h"
+#include "spi.h"
+#include "i2c.h"
 
 
 
@@ -33,19 +33,45 @@ int main(void) {
 Serial.begin(9600);
   // HARDWARE INITIALIZATIONS
   initSwitchPD0();
-  
+
   
   initTimer1();
   sei();
-  
+  SPI_MASTER_Init(); //Initialize the SPI module
 
+  write_execute(0x0A,0x08);//Brightness control
+  write_execute(0x0B,0x07);//scan all rows and collumns
+  write_execute(0x0C,0x01);//set shutdown register to normal operation
+  write_execute(0x0F,0x00);//display test register set to normal operation
+   AccelerationState=smile;
   while(1){
+
+      delayMs(1000);
+      
 
 
     switch(AccelerationState){
         case smile:
+        write_execute(0x01,0b00000000);
+        write_execute(0x02,0b00000000);
+        write_execute(0x03,0b00100100);
+        write_execute(0x04,0b00000000);
+        write_execute(0x05,0b10000001);
+        write_execute(0x06,0b01100110);
+        write_execute(0x07,0b00111100);
+        write_execute(0x08,0b00000000);
+        AccelerationState=frown;
           break;
         case frown:
+        write_execute(0x01,0b00000000);
+        write_execute(0x02,0b00000000);
+        write_execute(0x03,0b00100100);
+        write_execute(0x04,0b00000000);
+        write_execute(0x05,0b00011000);
+        write_execute(0x06,0b01100110);
+        write_execute(0x07,0b10000001);
+        write_execute(0x08,0b00000000);
+        AccelerationState=smile;
          break;
     }
     // Check the state
@@ -55,7 +81,7 @@ Serial.begin(9600);
         break;
       case debounce_press:
         // Wait for the noisy 'debounce' state to pass. Then, we are awaiting release.
-        delay_Ms(1);
+        delayMs(1);
         button_state = wait_release;
         break;
       case wait_release:
@@ -64,7 +90,7 @@ Serial.begin(9600);
       case debounce_release:
         // The button has been released.
         // Wait for the noisy 'debounce' state to pass. Then, we are awaiting press.
-        delay_Ms(1);
+        delayMs(1);
         
         button_state = wait_press;
         break;
