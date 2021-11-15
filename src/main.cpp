@@ -25,6 +25,19 @@ typedef enum LEDstate {smile, frown} LEDstate;
 volatile stateEnum button_state = wait_press; // ASSUMING WE BEGIN IN A STATE WHERE THE BUTTON IS NOT BEING PRESSED
 volatile LEDstate AccelerationState=frown;//initialize the state to frown 
 //----------------------------------------------------------------------//
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Main function
 int main(void) {
 
@@ -45,13 +58,23 @@ Serial.begin(9600);
   write_execute(0x0F,0x00);//display test register set to normal operation
    AccelerationState=smile;
   while(1){
+    
+    
+    change_frequency(freq_count);
+    freq_count++;
+    if(freq_count > 10000){
+      freq_count = 500;
+    }
+    else{
+      freq_count = freq_count;
+    }
+
 
       delayMs(1000);
       
-
-
     switch(AccelerationState){
         case smile:
+        OCR1C = 0;
         write_execute(0x01,0b00000000);
         write_execute(0x02,0b00000000);
         write_execute(0x03,0b00100100);
@@ -63,6 +86,7 @@ Serial.begin(9600);
         AccelerationState=frown;
           break;
         case frown:
+        OCR1C = OCR1A * 0.25;
         write_execute(0x01,0b00000000);
         write_execute(0x02,0b00000000);
         write_execute(0x03,0b00100100);
