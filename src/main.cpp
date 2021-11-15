@@ -62,7 +62,7 @@ int main(void) {
     // READ ACCELEROMETEROR
     Read_from(0x68, 0x40);
     data = Read_data();
-    Serial.print(data);
+    Serial.println(data);
 
     // DISPLAY STATE MACHINE:      
     switch(AccelerationState){
