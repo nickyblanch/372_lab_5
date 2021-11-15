@@ -41,5 +41,4 @@ void initPWMTimer1() {
 void change_frequency(unsigned int freq_val) {
     // To vary the frequency, we need to to change OCR1A (the TOP value) and OCR1C (the COMPARE value)
     OCR1A = 16000000/freq_val;  // (ignoring the 1 in the formula)
-    OCR1C = OCR1A * 0.25;       // 50% duty cycle
 }

@@ -27,7 +27,7 @@ volatile LEDstate AccelerationState=frown;//initialize the state to frown
 //----------------------------------------------------------------------//
 // Main function
 int main(void) {
-
+int freq_count = 500;
   // VARIABLES
 
 Serial.begin(9600);
@@ -46,32 +46,21 @@ Serial.begin(9600);
    AccelerationState=smile;
   while(1){
 
-      delayMs(1000);
-      
-
+    change_frequency(freq_count);
+    freq_count++;
+    if(freq_count > 10000){
+      freq_count = 500;
+    }
+    else{
+      freq_count = freq_count;
+    }
 
     switch(AccelerationState){
         case smile:
-        write_execute(0x01,0b00000000);
-        write_execute(0x02,0b00000000);
-        write_execute(0x03,0b00100100);
-        write_execute(0x04,0b00000000);
-        write_execute(0x05,0b10000001);
-        write_execute(0x06,0b01100110);
-        write_execute(0x07,0b00111100);
-        write_execute(0x08,0b00000000);
-        AccelerationState=frown;
+        OCR1C = 0;
           break;
         case frown:
-        write_execute(0x01,0b00000000);
-        write_execute(0x02,0b00000000);
-        write_execute(0x03,0b00100100);
-        write_execute(0x04,0b00000000);
-        write_execute(0x05,0b00011000);
-        write_execute(0x06,0b01100110);
-        write_execute(0x07,0b10000001);
-        write_execute(0x08,0b00000000);
-        AccelerationState=smile;
+        OCR1C = OCR1A * 0.25;
          break;
     }
     // Check the state
