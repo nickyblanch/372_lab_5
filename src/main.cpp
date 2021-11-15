@@ -31,6 +31,7 @@ int main(void) {
 
   // VARIABLES
   int freq_count = 500;
+  int data = 0;
 
   // HARDWARE INITIALIZATIONS
   initSwitchPD0();      // Initialize the switch
@@ -60,6 +61,8 @@ int main(void) {
 
     // READ ACCELEROMETEROR
     Read_from(0x68, 0x40);
+    data = Read_data();
+    Serial.print(data);
 
     // DISPLAY STATE MACHINE:      
     switch(AccelerationState){
