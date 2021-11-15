@@ -59,7 +59,7 @@ int main(void) {
     }
 
     // READ ACCELEROMETEROR
-    
+    Read_from(0x68, 0x40);
 
     // DISPLAY STATE MACHINE:      
     switch(AccelerationState){

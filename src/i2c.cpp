@@ -88,7 +88,7 @@ void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
   
 
 
-unsigned char Read_data() // Returns the last byte  from the data register
+unsigned char Read_data() // Returns the last byte from the data register
 {
   return TWDR;
 }
