@@ -26,22 +26,11 @@ volatile stateEnum button_state = wait_press; // ASSUMING WE BEGIN IN A STATE WH
 volatile LEDstate AccelerationState=frown;//initialize the state to frown 
 //----------------------------------------------------------------------//
 
-
-
-
-
-
-
-
-
-
-
-
-
 // Main function
 int main(void) {
 
   // VARIABLES
+int freq_count = 500;
 
 Serial.begin(9600);
   // HARDWARE INITIALIZATIONS
