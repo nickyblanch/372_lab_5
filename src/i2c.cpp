@@ -8,8 +8,9 @@
 void initI2C() {
   
   PRR0 &= ~(1<<PRTWI);  // wake up I2C module on AT2560 power management register
-  TWSR |= (1 << TWPS0);  // prescaler power = 1
-  TWSR &= ~(1 << TWPS1); // prescaler power = 1 
+  
+  TWSR |= (1 << TWPS0);  // prescaler = 4 (4 ^ 1)
+  TWSR &= ~(1 << TWPS1); // 
   //𝑇𝑊𝐵𝑅=((𝐶𝑃𝑈 𝐶𝑙𝑜𝑐𝑘 𝑓𝑟𝑒𝑞𝑢𝑒𝑛𝑐𝑦)/(𝑆𝐶𝐿 𝑓𝑟𝑒𝑞𝑢𝑒𝑛𝑐𝑦)−16)/(2∗〖(4)〗^𝑇𝑊𝑃𝑆 )
   TWBR = 0xC6; // bit rate generator = 10k  (TWBR = 198)
 
@@ -39,6 +40,8 @@ void write(unsigned char data){
   TWCR = (1<<TWINT)|(1<<TWEN);  // trigger action:  clear flag and enable TWI
   wait_for_completion;
 }
+
+
 void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
   // this function sets up reading from SLA at the SLA MEMADDRESS 
 
