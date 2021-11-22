@@ -54,7 +54,7 @@ int main(void) {
   while(1) {
     
     // BUZZER:
-    /*
+    
     change_frequency(freq_count);
     freq_count++;
     if(freq_count > 10000){
@@ -63,12 +63,14 @@ int main(void) {
     else{
       freq_count = freq_count;
     }
-    */
+    
+    // READ ACCELEROMETER
+    Serial.println("Read from accelerometer");
+    Read_from(0x68, 0x3B);
+    data = Read_data();
+    Serial.println("Print data");
 
-    // READ ACCELEROMETEROR
-    //Read_from(0x68, 0x40);
-    //data = Read_data();
-    Serial.println("test");
+    Serial.println(data);
 
     // DISPLAY STATE MACHINE:      
     switch(AccelerationState){
