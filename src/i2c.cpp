@@ -83,9 +83,11 @@ void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
   TWDR = (SLA << 1) | 0x01; // 7 bit address for slave plus read bit
   TWCR = (1 << TWINT) | (1 << TWEN)| (1 << TWEA);// trigger with master sending ack
   wait_for_completion;
+          Serial.println("Completed");
+
   TWCR = (1<< TWINT) | (1 << TWEN);  // master can send a nack now
   wait_for_completion;
-        Serial.println("Completed");
+          Serial.println("CompletedCompleted");
 
   TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO); // Stop condition
   // after this function is executed the TWDR register has the data from SLA that Master wants to read
@@ -95,8 +97,5 @@ void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
 
 unsigned char Read_data() // Returns the last byte from the data register
 {
-  Serial.println("ReturnDATA");
-          Serial.println(TWDR);
-
   return TWDR;
 }

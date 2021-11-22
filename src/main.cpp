@@ -31,11 +31,11 @@ int main(void) {
 
   Serial.begin(9600);   // Serial (for debugging)
   Serial.println("Beginning main");
-
+  initI2C();
   
   // VARIABLES
   int freq_count = 500;
-  int data = 0;
+  int data = 69;
 
   // HARDWARE INITIALIZATIONS
   initSwitchPD0();      // Initialize the switch
@@ -49,6 +49,12 @@ int main(void) {
   write_execute(0x0C,0x01); //set shutdown register to normal operation
   write_execute(0x0F,0x00); //display test register set to normal operation
   AccelerationState=smile;  // Begin in the smile state
+
+  Serial.println("WAKE TF UP");
+  StartI2C_Trans(0x68);
+  write(0);
+  write(0x6B);
+  StopI2C_Trans();
 
   Serial.println("Entering while loop");
   while(1) {
@@ -64,13 +70,18 @@ int main(void) {
       freq_count = freq_count;
     }
     
+  
     // READ ACCELEROMETER
     Serial.println("Read from accelerometer");
-    Read_from(0x68, 0x3B);
+    Read_from(0x68, 0x41);
     data = Read_data();
+    Read_from(0x68, 0x42);
+    data = Read_data();
+    StopI2C_Trans();
     Serial.println("Print data");
 
     Serial.println(data);
+    delayMs(1000);
 
     // DISPLAY STATE MACHINE:      
     switch(AccelerationState){
