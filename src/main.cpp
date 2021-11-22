@@ -29,14 +29,10 @@ volatile LEDstate AccelerationState=frown;    // Tnitialize the state to frown
 // Main function
 int main(void) {
 
-  Serial.begin(9600);
-  _delay_ms(1000);
+  Serial.begin(9600);   // Serial (for debugging)
+  Serial.println("Beginning main");
 
-  while(1) {
-    Serial.println("test");
-    _delay_ms(1000);
-  }
-  /*
+  
   // VARIABLES
   int freq_count = 500;
   int data = 0;
@@ -45,7 +41,6 @@ int main(void) {
   initSwitchPD0();      // Initialize the switch
   SPI_MASTER_Init();    //Initialize the SPI module
   initTimer1();         // Initialize timer 1 (for millisecond delay)
-  Serial.begin(9600);   // Serial (for debugging)
   sei();                // Enable global interrupts
 
   // SETUP DISPLAY
@@ -55,9 +50,11 @@ int main(void) {
   write_execute(0x0F,0x00); //display test register set to normal operation
   AccelerationState=smile;  // Begin in the smile state
 
+  Serial.println("Entering while loop");
   while(1) {
     
     // BUZZER:
+    /*
     change_frequency(freq_count);
     freq_count++;
     if(freq_count > 10000){
@@ -66,10 +63,11 @@ int main(void) {
     else{
       freq_count = freq_count;
     }
+    */
 
     // READ ACCELEROMETEROR
-    Read_from(0x68, 0x40);
-    data = Read_data();
+    //Read_from(0x68, 0x40);
+    //data = Read_data();
     Serial.println("test");
 
     // DISPLAY STATE MACHINE:      
@@ -122,7 +120,6 @@ int main(void) {
 
     } // end switch state machine  
   } // end while loop
-  */
 } // end main
 
 
