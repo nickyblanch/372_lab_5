@@ -29,6 +29,14 @@ volatile LEDstate AccelerationState=frown;    // Tnitialize the state to frown
 // Main function
 int main(void) {
 
+  Serial.begin(9600);
+  _delay_ms(1000);
+
+  while(1) {
+    Serial.println("test");
+    _delay_ms(1000);
+  }
+  /*
   // VARIABLES
   int freq_count = 500;
   int data = 0;
@@ -62,7 +70,7 @@ int main(void) {
     // READ ACCELEROMETEROR
     Read_from(0x68, 0x40);
     data = Read_data();
-    Serial.println(data);
+    Serial.println("test");
 
     // DISPLAY STATE MACHINE:      
     switch(AccelerationState){
@@ -114,6 +122,7 @@ int main(void) {
 
     } // end switch state machine  
   } // end while loop
+  */
 } // end main
 
 
