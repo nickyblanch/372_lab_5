@@ -1,3 +1,6 @@
+// Nick Blanchard, Nicholas Gullo, Konner Curtis, Salman Marafie
+// ECE 372 Lab 5
+// 11/29/21
 
 #include <avr/io.h>
 #include "Arduino.h"
@@ -12,7 +15,8 @@ void initI2C() {
   PRR0 &= ~(1<<PRTWI);  // wake up I2C module on AT2560 power management register
   
   TWSR |= (1 << TWPS0);  // prescaler = 4 (4 ^ 1)
-  TWSR &= ~(1 << TWPS1); // 
+  TWSR &= ~(1 << TWPS1); //
+
   //𝑇𝑊𝐵𝑅=((𝐶𝑃𝑈 𝐶𝑙𝑜𝑐𝑘 𝑓𝑟𝑒𝑞𝑢𝑒𝑛𝑐𝑦)/(𝑆𝐶𝐿 𝑓𝑟𝑒𝑞𝑢𝑒𝑛𝑐𝑦)−16)/(2∗〖(4)〗^𝑇𝑊𝑃𝑆 )
   TWBR = 0xC6; // bit rate generator = 10k  (TWBR = 198)
 
@@ -44,9 +48,10 @@ void StartI2C_Trans(unsigned char SLA) {
 
 void StopI2C_Trans() {
   // this function sends a stop condition to stop I2C transmission
-
-  TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWSTO); //trigger action:  send stop condition
-
+  TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWSTO); // trigger action:  send stop condition
+  // TWINT -> interrupt flag; flagged when reads or writes are completed
+  // TWEN -> turn I2C module on
+  // TWSTO -> stop condition
 }
 
 

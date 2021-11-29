@@ -1,4 +1,8 @@
+// Nick Blanchard, Nicholas Gullo, Konner Curtis, Salman Marafie
+// ECE 372 Lab 5
+// 11/29/21
 
+// Header and source files
 #include <Arduino.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -7,6 +11,8 @@
 #include "pwm.h"
 #include "spi.h"
 #include "i2c.h"
+
+// MPU I2C Slave address and internal data addresses
 #define SLA 0x68  // MPU_6050 address with PIN AD0 grounded
 #define PWR_MGMT  0x6B
 #define WAKEUP 0x00
@@ -19,10 +25,6 @@
 #define SL_TEMP_HIGH      0x41
 #define SL_TEMP_LOW       0x42
 
-
-
-//----------------------------------------------------------------------//
-// Global variables
 
 //----------------------------------------------------------------------//
 // State machines
@@ -50,10 +52,10 @@ int main(void) {
   // HARDWARE INITIALIZATIONS
   initSwitchPE0();      // Initialize the switch
   SPI_MASTER_Init();    //Initialize the SPI module
-  initPWMTimer4(); 
-  initTimer1();        // Initialize timer 1 (for millisecond delay)
+  initPWMTimer4();      // Initialize timer 4 for PWM mode 15
+  initTimer1();         // Initialize timer 1 (for millisecond delay)
+  initI2C();            // Initialize I2C bus
   sei();                // Enable global interrupts
-  initI2C();
 
   // SETUP DISPLAY
   write_execute(0x0A,0x08); //Brightness control
@@ -66,11 +68,9 @@ int main(void) {
   signed int x_val = 0;
   signed int y_val = 0;
   signed int z_val = 0;
-
-  float T_C = 0;	
   StartI2C_Trans(SLA);
   write(PWR_MGMT);// address on SLA for Power Management
-  write(WAKEUP); // send data to Wake up from sleep mode
+  write(WAKEUP);  // send data to Wake up from sleep mode
   StopI2C_Trans();
 
 
@@ -78,10 +78,8 @@ int main(void) {
   while(1) {
     
     // BUZZER:
-    Serial.println(OCR4C);
-    Serial.println(freq_count);
     if(trigger){
-      OCR4C = OCR4A * 0.25;
+      change_duty_cycle(0.25);
       change_frequency(freq_count);
       freq_count = freq_count + 500;
       if(freq_count > 10000){
@@ -89,20 +87,17 @@ int main(void) {
       }
     }
     else{
-      //Serial.println("SHHHHHHH");
       freq_count = freq_count;
-      OCR4C = 0;
+      change_duty_cycle(0);
     }
   
 
-    
-  
     // READ ACCELEROMETER
-    //_delay_ms(1000);
     Read_from(SLA,SL_MEMA_XAX_HIGH);
     x_val= Read_data(); // read upper value
     Read_from(SLA,SL_MEMA_XAX_LOW);
     x_val = (x_val << 8 )| Read_data(); // append lower value
+    StopI2C_Trans();
 
     Read_from(SLA,SL_MEMA_YAX_HIGH);
     y_val= Read_data(); // read upper value
@@ -114,24 +109,25 @@ int main(void) {
     Read_from(SLA,SL_MEMA_ZAX_LOW);
     z_val = (z_val << 8 )| Read_data(); // append lower value
 
-   // Serial.print("X accel =  ");
-   // Serial.println(x_val);
+    Serial.print("X accel =  ");
+    Serial.println(x_val);
 
-   // Serial.print("y accel =  ");
-   // Serial.println(y_val);
+    Serial.print("y accel =  ");
+    Serial.println(y_val);
 
-  //  Serial.print("z accel =  ");
-   // Serial.println(z_val);
-   // Serial.println("");
-    StopI2C_Trans();
+    Serial.print("z accel =  ");
+    Serial.println(z_val);
+    Serial.println("");
 
+    //delayMs(1000);
 
     // DISPLAY STATE MACHINE:
-    if (fabs(x_val) < 10000 ) {
-      AccelerationState = smile;
+    // Acceleration threshold value: 10000 -> 45 degrees
+    if ((fabs(x_val) > 10000) |  (fabs(y_val) > 10000)) {
+      AccelerationState = frown;
     }
     else {
-      AccelerationState = frown;
+      AccelerationState = smile;
     } 
     switch(AccelerationState){
         case smile:
@@ -145,7 +141,7 @@ int main(void) {
           write_execute(0x08,0b00000000);
           break;
         case frown:
-          trigger = true;
+          trigger = true; // Enable buzzer sound
           write_execute(0x01,0b00000000);
           write_execute(0x02,0b00000000);
           write_execute(0x03,0b00100100);
@@ -165,18 +161,15 @@ int main(void) {
         //Serial.println("wait press");
         break;
       case debounce_press:
-      Serial.println("debounce press");
         // Wait for the noisy 'debounce' state to pass. Then, we are awaiting release.
         delayMs(1);
         button_state = wait_release;
         break;
       case wait_release:
-      Serial.println("wait release");
         // Do nothing; we are waiting for the button to be released.
          trigger = false;
         break;
       case debounce_release:
-      Serial.println("debounce release");
         // The button has been released.
         // Wait for the noisy 'debounce' state to pass. Then, we are awaiting press.
         delayMs(1);
@@ -203,14 +196,7 @@ ISR (PCINT1_vect) {
     // The button was released while we were waiting for it to be released. Enter the second debounce state.
     button_state = debounce_release;
 
-    // Buzzer:
-    if (OCR4C) {
-      OCR4C = 0;
-      //Serial.println("BUTTON");
-    }
-    else {
-      OCR4C = OCR4A*.25;
-    } // end if/else
+    change_duty_cycle(0); // Turn the buzzer off
   } // end if/else
   // If the flag triggers while the button is 1 in one of the noisy debounce states, we do nothing.
 } // end ISR

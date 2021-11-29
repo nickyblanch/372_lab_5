@@ -1,3 +1,7 @@
+// Nick Blanchard, Nicholas Gullo, Konner Curtis, Salman Marafie
+// ECE 372 Lab 5
+// 11/29/21
+
 #include <avr/io.h>
 
 void initTimer1(){

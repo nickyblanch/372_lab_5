@@ -1,3 +1,7 @@
+// Nick Blanchard, Nicholas Gullo, Konner Curtis, Salman Marafie
+// ECE 372 Lab 5
+// 11/29/21
+
 #ifndef I2C_H
 #define I2C_H
 

@@ -1,7 +1,6 @@
-// Author: Nick Blanchard,  
-// Net ID:        
-// Date: 11/15/21         
-// Assignment:     Lab 5
+// Nick Blanchard, Nicholas Gullo, Konner Curtis, Salman Marafie
+// ECE 372 Lab 5
+// 11/29/21
 //----------------------------------------------------------------------//
 
 #ifndef TIMER_H
