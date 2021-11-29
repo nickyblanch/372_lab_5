@@ -79,7 +79,7 @@ int main(void) {
     
     // BUZZER:
     if(trigger){
-      change_duty_cycle(0.25);
+      change_duty_cycle(0.05);
       change_frequency(freq_count);
       freq_count = freq_count + 500;
       if(freq_count > 10000){
