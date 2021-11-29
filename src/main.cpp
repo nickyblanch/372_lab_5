@@ -83,7 +83,7 @@ int main(void) {
     if(trigger){
       OCR4C = OCR4A * 0.25;
       change_frequency(freq_count);
-      freq_count = freq_count + 100;
+      freq_count = freq_count + 500;
       if(freq_count > 10000){
         freq_count = 500;
       }
