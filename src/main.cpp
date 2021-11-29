@@ -45,9 +45,10 @@ int main(void) {
   // VARIABLES
   int freq_count = 500;
   int data = 0;
+  bool trigger = false;
 
   // HARDWARE INITIALIZATIONS
-  initSwitchPD0();      // Initialize the switch
+  initSwitchPE0();      // Initialize the switch
   SPI_MASTER_Init();    //Initialize the SPI module
   initTimer1();         // Initialize timer 1 (for millisecond delay)
   sei();                // Enable global interrupts
@@ -76,16 +77,23 @@ int main(void) {
   while(1) {
     
     // BUZZER:
-    /*
-    change_frequency(freq_count);
-    freq_count++;
-    if(freq_count > 10000){
-      freq_count = 500;
+    Serial.println(OCR1C);
+    Serial.println(freq_count);
+    if(trigger){
+      OCR1C = OCR1A * 0.25;
+      change_frequency(freq_count);
+      freq_count = freq_count + 100;
+      if(freq_count > 10000){
+        freq_count = 500;
+      }
     }
     else{
+      //Serial.println("SHHHHHHH");
       freq_count = freq_count;
+      OCR1C = 0;
     }
-    */
+  
+
     
   
     // READ ACCELEROMETER
@@ -105,15 +113,15 @@ int main(void) {
     Read_from(SLA,SL_MEMA_ZAX_LOW);
     z_val = (z_val << 8 )| Read_data(); // append lower value
 
-    Serial.print("X accel =  ");
-    Serial.println(x_val);
+   // Serial.print("X accel =  ");
+   // Serial.println(x_val);
 
-    Serial.print("y accel =  ");
-    Serial.println(y_val);
+   // Serial.print("y accel =  ");
+   // Serial.println(y_val);
 
-    Serial.print("z accel =  ");
-    Serial.println(z_val);
-    Serial.println("");
+  //  Serial.print("z accel =  ");
+   // Serial.println(z_val);
+   // Serial.println("");
     StopI2C_Trans();
 
 
@@ -126,7 +134,6 @@ int main(void) {
     } 
     switch(AccelerationState){
         case smile:
-          OCR1C = 0;
           write_execute(0x01,0b00000000);
           write_execute(0x02,0b00000000);
           write_execute(0x03,0b00100100);
@@ -137,7 +144,7 @@ int main(void) {
           write_execute(0x08,0b00000000);
           break;
         case frown:
-          OCR1C = OCR1A * 0.25;
+          trigger = true;
           write_execute(0x01,0b00000000);
           write_execute(0x02,0b00000000);
           write_execute(0x03,0b00100100);
@@ -154,20 +161,24 @@ int main(void) {
 
       case wait_press:
         // Do nothing; we are waiting for the button to be pressed.
+        //Serial.println("wait press");
         break;
       case debounce_press:
+      Serial.println("debounce press");
         // Wait for the noisy 'debounce' state to pass. Then, we are awaiting release.
         delayMs(1);
         button_state = wait_release;
         break;
       case wait_release:
+      Serial.println("wait release");
         // Do nothing; we are waiting for the button to be released.
+         trigger = false;
         break;
       case debounce_release:
+      Serial.println("debounce release");
         // The button has been released.
         // Wait for the noisy 'debounce' state to pass. Then, we are awaiting press.
         delayMs(1);
-        
         button_state = wait_press;
         break;
 
@@ -180,9 +191,9 @@ int main(void) {
 //----------------------------------------------------------------------//
 // Interrupt
 
-ISR (INT0_vect) {
+ISR (PCINT1_vect) {
+  Serial.println("INTERUPT");
   // When the interrupt flag is triggered:
-
   if (button_state == wait_press) {
     // The button was pushed while we were waiting for it to be pressed. Enter the first debounce state.
     button_state = debounce_press;
@@ -194,6 +205,7 @@ ISR (INT0_vect) {
     // Buzzer:
     if (OCR1C) {
       OCR1C = 0;
+      //Serial.println("BUTTON");
     }
     else {
       OCR1C = OCR1A*.25;

@@ -2,5 +2,5 @@
 #define switch_h
 
 
-void initSwitchPD0();
+void initSwitchPE0();
 #endif
