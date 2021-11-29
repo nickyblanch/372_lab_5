@@ -50,7 +50,8 @@ int main(void) {
   // HARDWARE INITIALIZATIONS
   initSwitchPE0();      // Initialize the switch
   SPI_MASTER_Init();    //Initialize the SPI module
-  initTimer1();         // Initialize timer 1 (for millisecond delay)
+  initPWMTimer4(); 
+  initTimer1();        // Initialize timer 1 (for millisecond delay)
   sei();                // Enable global interrupts
   initI2C();
 
@@ -77,10 +78,10 @@ int main(void) {
   while(1) {
     
     // BUZZER:
-    Serial.println(OCR1C);
+    Serial.println(OCR4C);
     Serial.println(freq_count);
     if(trigger){
-      OCR1C = OCR1A * 0.25;
+      OCR4C = OCR4A * 0.25;
       change_frequency(freq_count);
       freq_count = freq_count + 100;
       if(freq_count > 10000){
@@ -90,7 +91,7 @@ int main(void) {
     else{
       //Serial.println("SHHHHHHH");
       freq_count = freq_count;
-      OCR1C = 0;
+      OCR4C = 0;
     }
   
 
@@ -203,12 +204,12 @@ ISR (PCINT1_vect) {
     button_state = debounce_release;
 
     // Buzzer:
-    if (OCR1C) {
-      OCR1C = 0;
+    if (OCR4C) {
+      OCR4C = 0;
       //Serial.println("BUTTON");
     }
     else {
-      OCR1C = OCR1A*.25;
+      OCR4C = OCR4A*.25;
     } // end if/else
   } // end if/else
   // If the flag triggers while the button is 1 in one of the noisy debounce states, we do nothing.
